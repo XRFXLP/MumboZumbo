@@ -122,7 +122,7 @@ def allow_ip_forwarding():
     # You would normally run the command sysctl -w net.ipv4.ip_forward=1 to enable ip forwarding. We run this with subprocess.run()
     subprocess.run(["sysctl", "-w", "net.ipv4.ip_forward=1"])
     # Load  in sysctl settings from the /etc/sysctl.conf file. 
-    subprocess.run(["sysctl", "-p", "/etc/sysctl.conf"])
+    subprocess.run(["sysctl", "-p", "--system"])
 
 
 def arp_spoofer(target_ip, target_mac, spoof_ip):
