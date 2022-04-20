@@ -61,15 +61,7 @@ def is_gateway(gateway_ip):
     return False
 
 
-def get_interface_names():
-    """The interface names of a networks are listed in the /sys/class/net folder in Kali. This function returns a list of interfaces in Kali."""
-    # The interface names are directory names in the /sys/class/net folder. So we change the directory to go there.
-    os.chdir("/sys/class/net")
-    # We use the listdir() function from the os module. Since we know there won't be files and only directories with the interface names we can save the output as the interface names.
-    interface_names = os.listdir()
-    # We return the interface names which we will use to find out which one is the name of the gateway.
-    return interface_names
-
+get_interface_names = scapy.get_if_list()
 
 def match_iface_name(row):
     # We get all the interface names by running the function defined above with the 
